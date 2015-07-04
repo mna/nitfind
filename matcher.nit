@@ -44,7 +44,7 @@ class LitMatcher
     redef fun match(s)
     do
         if ignore_case then s = s.to_lower
-        return s.chars.index_of(substr) >= 0
+        return s.has(substr)
     end
 end
 

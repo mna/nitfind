@@ -34,8 +34,13 @@ class TestCircularBuffer
         with_cap(4, ["a", "ab", "abc", "abcd", "bcde", "cdef", "fghi", "lmno"])
 	end
 
-    private fun with_cap(cap: Int, want: Array[String]) do
-        var buf = new CircularBuffer(cap)
+    fun test_clear do
+        var buf = with_cap(4, ["a", "ab", "abc", "abcd", "bcde", "cdef", "fghi", "lmno"])
+        buf.clear
+        with_buf(buf, 4, ["a", "ab", "abc", "abcd", "bcde", "cdef", "fghi", "lmno"])
+    end
+
+    private fun with_buf(buf: CircularBuffer, cap: Int, want: Array[String]) do
         var s = buf.plain_to_s
         assert s == "" else
             print("empty buf with cap {cap}")
@@ -65,5 +70,11 @@ class TestCircularBuffer
         assert s == want[want_ix] else
             print("cap {cap}, after add {v}, want {want[want_ix]}, got {s}")
         end
+    end
+
+    private fun with_cap(cap: Int, want: Array[String]): CircularBuffer do
+        var buf = new CircularBuffer(cap)
+        with_buf(buf, cap, want)
+        return buf
     end
 end

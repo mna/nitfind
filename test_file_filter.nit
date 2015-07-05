@@ -13,5 +13,6 @@ class TestDirFileFilter
 
         var got = ff.files
         assert got.length > 0
+        assert got.has("./test_file_filter.nit")
     end
 end

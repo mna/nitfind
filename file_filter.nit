@@ -40,7 +40,7 @@ class DirFileFilter
             if stat == null then continue
             if stat.is_file then
                 if matcher.match(f) then
-                    list.add(f)
+                    list.add(dir/f)
                 end
             else if stat.is_dir and level < max_depth then
                 find_in_dir(dir/f, level + 1, list)

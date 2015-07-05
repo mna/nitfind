@@ -1,28 +1,33 @@
-# This module defines the file filter that returns the list of files
+# This module defines the file resolver that returns the list of files
 # that must be searched.
-module file_filter
+module file_resolver
 
 import matcher
 import standard::file
 
 #
-abstract class AbstractFileFilter
+interface FileResolver
     #
     fun files: Array[String] is abstract
 end
 
 #
-class DirFileFilter
-    super AbstractFileFilter
+class DirFileResolver
+    super FileResolver
 
-    #
+    # root directory to process.
     var root: String
 
-    # matcher determines if a file should be included or not in the
+    # file_matcher determines if a file should be included or not in the
     # files to return.
-    var matcher: Matcher
+    var file_matcher: Matcher
 
-    #
+    # dir_matcher determines if a directory should be processed or not.
+    var dir_matcher = new PassthroughMatcher
+
+    # maximum depth to recursively process under the root directory. No
+    # recursive processing means max_depth = 0 (will only process files
+    # directly in root).
     var max_depth: Int = 6
 
     redef fun files
@@ -39,10 +44,10 @@ class DirFileFilter
             var stat = (dir/f).to_path.stat
             if stat == null then continue
             if stat.is_file then
-                if matcher.match(f) then
+                if file_matcher.match(f) then
                     list.add(dir/f)
                 end
-            else if stat.is_dir and level < max_depth then
+            else if stat.is_dir and level < max_depth and dir_matcher.match(f) then
                 find_in_dir(dir/f, level + 1, list)
             end
         end

@@ -13,6 +13,13 @@ interface Matcher
     fun match(s: String): Bool is abstract
 end
 
+# PassthroughMatcher is an implementation of a matcher that always matches.
+class PassthroughMatcher
+    super Matcher
+
+    redef fun match(s) do return true
+end
+
 # ReMatcher is a matcher that compares the given text with a regular
 # expression.
 class ReMatcher

@@ -35,6 +35,10 @@ class CircularBuffer
     # TODO : implement remove?
     redef fun remove(item) do abort
 
+    # TODO : will need an enlarge method, as the buffer required to hold
+    # a hit may be > than the contextual lines + 1, because more hits can
+    # occur within the contextual lines.
+
     redef fun clear do
         buffer.clear
         next_index = 0

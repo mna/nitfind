@@ -22,6 +22,7 @@ class Finder
 
     # find is the method that runs the search.
     fun find: Int do
+        var cnt = 0
         var files = resolver.files
         for file in files do
             var reader = file.to_path.open_ro
@@ -48,7 +49,8 @@ class Finder
             reader.close
 
             if hits.length > 0 then reporter.report(file, hits)
+            cnt += hits.length
         end
-        return 0
+        return cnt
     end
 end

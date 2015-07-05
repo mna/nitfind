@@ -28,23 +28,30 @@ class AckReporter
     super Reporter
 
     private var reported_once = false
+    private var has_ctx = false
+
+    # create a reporter with the specified contextual lines.
+    init with_ctx_lines(before, after: Int) do
+        has_ctx = (before + after) > 0
+    end
 
     redef fun report(path, hits) do
         if reported_once then print("")
         reported_once = true
-        print(path.green)
+        if path.has_prefix("./") then path = path.substring_from(2)
+        print(path.green.bold)
 
         # TODO : sort hits by start_line
 
         var line_no = 0
         for hit in hits do
-            if line_no > 0 and hit.start_line != line_no then print("--".yellow)
+            if has_ctx and line_no > 0 and hit.start_line != line_no then print("--".yellow)
             line_no = hit.start_line
             for line in hit.lines do
                 if line_no == hit.hit_line then
-                    print("{line_no}:".yellow + line)
+                    print("{line_no}:".yellow.bold + line)
                 else
-                    print("{line_no}-".yellow + line)
+                    print("{line_no}-".yellow.bold + line)
                 end
             end
             line_no += 1

@@ -24,7 +24,7 @@ class DirFileResolver
     var file_matcher: Matcher
 
     # dir_matcher determines if a directory should be processed or not.
-    var dir_matcher = new PassthroughMatcher
+    var dir_matcher: Matcher = new PassthroughMatcher is writable
 
     # maximum depth to recursively process under the root directory. No
     # recursive processing means max_depth = 0 (will only process files

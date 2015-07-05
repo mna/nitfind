@@ -33,23 +33,29 @@ if rest.length == 0 and patterns.value.length == 0 then
 end
 
 # If patterns is empty, then the pattern is the first rest parameter.
-var file_patterns = patterns.value
-if file_patterns.is_empty then file_patterns = [rest.shift]
+var search_patterns = patterns.value
+if search_patterns.is_empty then search_patterns = [rest.shift]
 
 # If no directory/files are specified, search in the current directory.
 var dir = "."
 if rest.length > 0 then dir = rest[0] # TODO : support multiple directories/files
 
-var resolver = new DirFileResolver(dir, new PassthroughMatcher)
-var reporter = new AckReporter
+# By default, ignore dotfiles and dot directories
+# TODO : support flag to alter this behaviour
+var dot_matcher = new ReMatcher("^\\.".to_re)
+var nodot_matcher = new NotMatcher(dot_matcher)
+var resolver = new DirFileResolver(dir, nodot_matcher)
+resolver.dir_matcher = nodot_matcher
+
+var reporter = new AckReporter.with_ctx_lines(ctx_before.value, ctx_after.value)
 
 # Buid the matchers
 var matchers = new Array[Matcher]
-for pat in file_patterns do
+for pat in search_patterns do
     matchers.add(new LitMatcher(pat, false)) # TODO : support flags for regex, case insensitive
 end
 var all_matcher = new AllMatcher
 all_matcher.add_matchers(matchers...)
 
 var finder = new Finder(all_matcher, resolver, reporter)
-finder.find
+if finder.find == 0 then exit(1)

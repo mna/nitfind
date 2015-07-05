@@ -17,12 +17,14 @@ var ctx_lines = new OptionInt("Print NUM lines of output context", 0, "-C", "--c
 var ctx_before = new OptionInt("Print NUM lines of leading context before matching lines", 0, "-B", "--before-context")
 var ctx_after = new OptionInt("Print NUM lines of trailing context after matching lines", 0, "-A", "--after-context")
 var patterns = new OptionArray("Pattern to match, may be set more than once", "--match")
-opt_ctx.add_option(usage, ctx_after, ctx_before, ctx_lines, patterns)
+var help = new OptionBool("Display usage text", "-h", "--help")
+
+opt_ctx.add_option(usage, ctx_after, ctx_before, ctx_lines, help, patterns)
 opt_ctx.parse(args)
 
 var rest = opt_ctx.rest
 if rest.length == 0 and patterns.value.length == 0 then
-    print("A pattern to match must be specified\n")
+    print("A pattern to match must be specified")
     opt_ctx.usage
     exit(-1)
 end

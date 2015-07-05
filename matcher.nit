@@ -4,6 +4,7 @@
 module matcher
 
 import standard::re
+import standard::file
 
 # Matcher is the interface that defines the match method.
 interface Matcher
@@ -60,12 +61,12 @@ abstract class MultiMatcher
     super Matcher
 
     # matchers is the list of matchers
-    var matchers = new Array[Matcher]
+    protected var matchers = new Array[Matcher]
 
     # add_matchers appends the provided matchers to the list of matchers.
-    fun add_matchers(matchers: Matcher...)
+    fun add_matchers(list: Matcher...)
     do
-        matchers.add_all(matchers) 
+        matchers.add_all(list) 
     end
 end
 

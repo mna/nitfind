@@ -83,3 +83,38 @@ class TestLitMatcher
         end
     end
 end
+
+class TestAnyMatcher
+    super TestSuite
+
+    fun test_match do
+        var lit = new LitMatcher("a", false)
+        var reg = new ReMatcher("[0-9]+".to_re)
+        var m = new AnyMatcher
+        assert not m.match("abc")
+
+        m.add_matchers(lit, reg)
+
+        assert m.match("baba")
+        assert m.match("zz12")
+        assert not m.match("zzxx")
+    end
+end
+
+class TestAllMatcher
+    super TestSuite
+
+    fun test_match do
+        var lit = new LitMatcher("a", false)
+        var reg = new ReMatcher("[0-9]+".to_re)
+        var m = new AllMatcher
+        assert m.match("abc")
+
+        m.add_matchers(lit, reg)
+
+        assert m.match("baba1")
+        assert m.match("123a")
+        assert not m.match("abc")
+        assert not m.match("123")
+    end
+end

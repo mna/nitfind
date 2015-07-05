@@ -49,6 +49,20 @@ class LitMatcher
     end
 end
 
+# NotMatcher inverses the result of a matcher.
+class NotMatcher
+    super Matcher
+
+    # the matcher to invert the result of.
+    var matcher: Matcher
+
+    redef fun match(s)
+    do
+        return not matcher.match(s)
+    end
+end
+
+# TODO : implement
 # GlobMatcher is a matcher that compares the given text with a glob-like
 # pattern, where * means zero or more characters and ? means a single
 # character. More advanced shell-recognized glob patterns are not supported.

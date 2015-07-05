@@ -5,3 +5,5 @@
 ## License
 
 The BSD 3-clause license. See the LICENSE file.
+
+[nit]: http://nitlanguage.org/

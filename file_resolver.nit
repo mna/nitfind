@@ -5,13 +5,14 @@ module file_resolver
 import matcher
 import standard::file
 
-#
+# Interface that defines the files method.
 interface FileResolver
-    #
+    # Returns the list of files to search.
     fun files: Array[String] is abstract
 end
 
-#
+# DirFileResolver is a FileResolver that looks for files to process in
+# a given directory, possibly traversing it recursively.
 class DirFileResolver
     super FileResolver
 

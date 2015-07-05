@@ -27,7 +27,11 @@ end
 class AckReporter
     super Reporter
 
+    private var reported_once = false
+
     redef fun report(path, hits) do
+        if reported_once then print("")
+        reported_once = true
         print(path.green)
 
         # TODO : sort hits by start_line

@@ -2,6 +2,9 @@
 module cmd
 
 import opts
+import matcher
+import reporter
+import finder
 
 var opt_ctx = new OptionContext
 opt_ctx.options_before_rest = true
@@ -29,4 +32,24 @@ if rest.length == 0 and patterns.value.length == 0 then
     exit(-1)
 end
 
-print("hello! {ctx_lines.value}, {ctx_before.value}, {ctx_after.value}, {patterns.value}, {opt_ctx.rest}")
+# If patterns is empty, then the pattern is the first rest parameter.
+var file_patterns = patterns.value
+if file_patterns.is_empty then file_patterns = [rest.shift]
+
+# If no directory/files are specified, search in the current directory.
+var dir = "."
+if rest.length > 0 then dir = rest[0] # TODO : support multiple directories/files
+
+var resolver = new DirFileResolver(dir, new PassthroughMatcher)
+var reporter = new AckReporter
+
+# Buid the matchers
+var matchers = new Array[Matcher]
+for pat in file_patterns do
+    matchers.add(new LitMatcher(pat, false)) # TODO : support flags for regex, case insensitive
+end
+var all_matcher = new AllMatcher
+all_matcher.add_matchers(matchers...)
+
+var finder = new Finder(all_matcher, resolver, reporter)
+finder.find

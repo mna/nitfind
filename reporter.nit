@@ -41,7 +41,8 @@ class AckReporter
         if path.has_prefix("./") then path = path.substring_from(2)
         print(path.green.bold)
 
-        # TODO : sort hits by start_line
+        # no need to sort hits by start_line, assume they are stored
+        # in the right order.
 
         var line_no = 0
         for hit in hits do

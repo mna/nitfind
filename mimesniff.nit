@@ -34,15 +34,17 @@ redef class Bytes
         # find the index of the first non-space char
         var first_non_ws = 0
         for ix in [0..self.length[ do
-            var ch = self[ix]
-            if is_whitespace(ch) then
+            var ch = self[ix].ascii
+            if not is_whitespace(ch) then
                 break
             end
             first_non_ws += 1 # so that no ws means it points 1 after last
         end
 
         for sig in sniff_signatures do
-            if sig.match(self, first_non_ws) then return sig.mime_type
+            if sig.match(self, first_non_ws) then
+                return sig.mime_type
+            end
         end
         return "application/octet-stream"
     end
@@ -63,8 +65,10 @@ private class ExactSignature
     redef fun match(data, first_non_ws) do
         if data.length < sig.length then return false
 
-        var sub = data.sub(0, sig.length)
-        return sub == sig
+        for ix in [0..sig.length[ do
+            if data[ix].ascii != sig.chars[ix] then return false
+        end
+        return true
     end
 end
 
@@ -76,10 +80,12 @@ private class TextSignature
     redef fun match(data, first_non_ws) do
         for ix in [first_non_ws..data.length[ do
             var data_byte = data[ix]
-            if 0x00 <= data_byte and data_byte <= 0x08 then return false
-            if data_byte == 0x0B then return false
-            if 0x0E <= data_byte and data_byte <= 0x1A then return false
-            if 0x1C <= data_byte and data_byte <= 0x1F then return false
+            if (0x00 <= data_byte and data_byte <= 0x08) or
+               (data_byte == 0x0B) or
+               (0x0E <= data_byte and data_byte <= 0x1A) or
+               (0x1C <= data_byte and data_byte <= 0x1F) then
+               return false
+           end
         end
         return true
     end
@@ -97,22 +103,19 @@ private class HtmlSignature
 
         for ix in [0..sig.length[ do
             var sig_ch = sig[ix]
-            var data_ch = data[first_non_ws + ix].to_c
+            var data_ch = data[first_non_ws + ix].ascii
 
             if 'A' <= sig_ch and sig_ch <= 'Z' then
-                data_ch = (data_ch.ascii & 0xDF).to_c
+                data_ch = (data_ch.ascii & 0xDF).ascii
             end
             if data_ch != sig_ch then return false
         end
         # next byte must be space or >
-        var next_ch = data[first_non_ws + sig.length]
-        if next_ch != ' ' and next_ch != '>' then
-            return false
-        end
-        return true
+        var next_ch = data[first_non_ws + sig.length].ascii
+        return next_ch ==  ' ' or next_ch == '>'
     end
 end
 
-private fun is_whitespace(ch: Int): Bool do
+private fun is_whitespace(ch: Char): Bool do
     return ['\t', '\f', '\n', '\r', ' '].has(ch)
 end

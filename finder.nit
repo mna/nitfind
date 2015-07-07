@@ -5,6 +5,7 @@ module finder
 import matcher
 import file_resolver
 import reporter
+import mimesniff
 
 # Finder class puts it all together, finds matchers in the files
 # and sends them to the reporter.
@@ -29,8 +30,13 @@ class Finder
 
             # skip binary files
             var bytes = reader.peek(512)
-            if bytes.has(0) then
-                reader.close
+            var mime_type = bytes.mime_type
+            if not mime_type.has_prefix("text/") and
+               not mime_type.has_prefix("application/json") and
+               not mime_type.has_prefix("application/javascript") and
+               not mime_type.has_prefix("application/ecmascript") and
+               not mime_type.has_prefix("application/xml") and
+               not mime_type.has_suffix("+xml") then
                 continue
             end
 

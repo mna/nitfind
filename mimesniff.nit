@@ -23,6 +23,7 @@ redef class Bytes
         new HtmlSignature("<BR"),
         new HtmlSignature("<P"),
         new HtmlSignature("<!--"),
+        new MaskedSignature("text/xml; charset=utf-8", "\xff\xff\xff\xff\xff\xff", "<?xml", true),
         new ExactSignature("application/pdf", "%PDF-"),
         new ExactSignature("application/postscript", "%!PS-Adobe-"),
         new TextSignature
@@ -54,6 +55,29 @@ private abstract class Signature
     var mime_type: String is noinit
 
     fun match(data: Bytes, first_non_ws: Int): Bool is abstract
+end
+
+private class MaskedSignature
+    super Signature
+
+    redef var mime_type
+    var mask: String
+    var pat: String
+    var skip_ws: Bool
+
+    redef fun match(data, first_non_ws) do
+        var start = 0
+        if skip_ws then start = first_non_ws
+        if (data.length - start) < mask.length then return false
+
+        for ix in [0..mask.length[ do
+            var data_ch = data[start + ix]
+            var mask_ch = mask[ix].ascii
+            var ch = data_ch & mask_ch
+            if ch != pat[ix].ascii then return false
+        end
+        return true
+    end
 end
 
 private class ExactSignature
